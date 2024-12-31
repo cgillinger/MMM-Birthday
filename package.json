@@ -1,0 +1,15 @@
+{
+    "name": "MMM-Birthday",
+    "version": "1.0.0",
+    "description": "A MagicMirror² module for birthday celebrations with fireworks and confetti",
+    "main": "MMM-Birthday.js",
+    "author": "Christian Gillinger",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/yourusername/MMM-Birthday.git"
+    },
+    "dependencies": {
+        "canvas-confetti": "^1.9.3"
+    }
+}
