@@ -4,7 +4,9 @@
 
 A MagicMirror² module that celebrates birthdays with animated fireworks and confetti effects.
 
-![Birthday Celebration Screenshot](screenshots/birthday.png)
+![Ukrainian Birthday Celebration Screenshot](screenshots/birthday.png)
+![French Birthday Celebration Screenshot](screenshots/birthday_french.png)
+![Englsih Birthday Celebration Screenshot](screenshots/birthday_en.png)
 
 ## Features
 
