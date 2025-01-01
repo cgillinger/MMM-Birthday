@@ -4,8 +4,13 @@
  * @author Christian Gillinger
  * @license MIT
  * @version 1.0.0
+ * 
+ * Core styling for birthday celebration displays and animations.
+ * Ensures visibility of celebrations while maintaining
+ * compatibility with MagicMirror's default theme.
  */
 
+/* Main module container - centered overlay */
 .birthday-module {
     position: fixed !important;
     top: 50% !important;
@@ -16,6 +21,7 @@
     text-align: center !important;
 }
 
+/* Birthday message styling with semi-transparent background */
 .birthday-message {
     background: rgba(0, 0, 0, 0.7);
     padding: 30px 50px;
@@ -30,6 +36,7 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Next birthday countdown styling */
 .next-birthday {
     font-size: 0.8em;
     color: var(--color-text-dimmed);
@@ -49,14 +56,14 @@
     }
 }
 
-/* Ensure module visibility during celebration */
+/* Force module visibility during celebration */
 .MMM-Birthday {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
 
-/* Debug mode styles */
+/* Debug information panel */
 .debug-info {
     position: fixed;
     bottom: 10px;
@@ -69,4 +76,3 @@
     z-index: 1000000;
     border-radius: 5px;
 }
-

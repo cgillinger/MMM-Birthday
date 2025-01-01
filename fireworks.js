@@ -5,13 +5,21 @@
  * @license MIT
  * @version 1.1.0
  * 
+ * This class creates an animated fireworks display using HTML5 Canvas.
+ * It handles particle physics, color management, and animation timing.
+ * 
  * Changelog:
  * 1.1.0 - Added infinite duration support and improved performance
  * 1.0.0 - Initial release
  */
 
 class Fireworks {
+    /**
+     * @constructor
+     * Initializes the fireworks display system
+     */
     constructor() {
+        // Vibrant color palette for firework particles
         this.colors = [
             '#ff0000', '#ffa500', '#ffff00', '#00ff00', '#00ffff',
             '#0000ff', '#ff00ff', '#ff1493', '#ffd700', '#00ff7f'
@@ -22,10 +30,15 @@ class Fireworks {
         this.createStyleSheet();
     }
 
+    /**
+     * @function createStyleSheet
+     * @description Creates and injects required CSS styles for animations
+     */
     createStyleSheet() {
         if (!document.getElementById('fireworkStyles')) {
             const style = document.createElement('style');
             style.id = 'fireworkStyles';
+            // CSS definitions for rockets and sparks with animations
             style.textContent = `
                 .rocket {
                     position: fixed;
@@ -109,6 +122,12 @@ class Fireworks {
         }
     }
 
+    /**
+     * @function createRocket
+     * @description Creates a single rocket element with trail effect
+     * @param {number} x - Horizontal position of the rocket
+     * @returns {HTMLElement} The rocket element
+     */
     createRocket(x) {
         const rocket = document.createElement('div');
         rocket.className = 'rocket';
@@ -120,6 +139,16 @@ class Fireworks {
         return rocket;
     }
 
+    /**
+     * @function createSpark
+     * @description Creates a spark particle for the explosion effect
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     * @param {string} color - Spark color in hex format
+     * @param {number} angle - Trajectory angle
+     * @param {number} velocity - Movement speed
+     * @returns {HTMLElement} The spark element
+     */
     createSpark(x, y, color, angle, velocity) {
         const spark = document.createElement('div');
         spark.className = 'spark';
@@ -128,6 +157,7 @@ class Fireworks {
         spark.style.backgroundColor = color;
         spark.style.boxShadow = `0 0 6px ${color}, 0 0 12px ${color}`;
         
+        // Calculate spark trajectory
         const rad = angle * Math.PI / 180;
         const duration = 0.8 + Math.random() * 0.6;
         const distance = velocity * (0.7 + Math.random() * 0.3);
@@ -135,6 +165,7 @@ class Fireworks {
         spark.style.transform = `translate(${Math.cos(rad) * distance}px, ${Math.sin(rad) * distance}px)`;
         spark.style.transition = `transform ${duration}s cubic-bezier(0.165, 0.84, 0.44, 1), opacity ${duration}s ease-out`;
         
+        // Add trailing effect
         const trail = document.createElement('div');
         trail.style.position = 'absolute';
         trail.style.height = '2px';
@@ -142,6 +173,7 @@ class Fireworks {
         trail.style.animation = 'sparkTrail 0.2s linear forwards';
         spark.appendChild(trail);
 
+        // Set fade out timing
         setTimeout(() => {
             spark.style.opacity = '0';
         }, duration * 900);
@@ -149,10 +181,18 @@ class Fireworks {
         return spark;
     }
 
+    /**
+     * @function createExplosion
+     * @description Generates a complete firework explosion effect
+     * @param {number} x - Explosion center X coordinate
+     * @param {number} y - Explosion center Y coordinate
+     * @param {string} color - Primary explosion color
+     */
     createExplosion(x, y, color) {
         const particleCount = 80;
         const sparks = [];
         
+        // Create spark particles in a circular pattern
         for (let i = 0; i < particleCount; i++) {
             const angle = (i * 360) / particleCount + Math.random() * 20;
             const velocity = 100 + Math.random() * 100;
@@ -160,6 +200,7 @@ class Fireworks {
             this.container.appendChild(spark);
             sparks.push(spark);
 
+            // Clean up sparks after animation
             setTimeout(() => {
                 if (spark.parentNode) {
                     spark.remove();
@@ -168,19 +209,27 @@ class Fireworks {
         }
     }
 
+    /**
+     * @function launch
+     * @description Launches a single firework
+     */
     launch() {
+        // Random horizontal position for launch
         const x = Math.random() * (window.innerWidth - 100) + 50;
         const color = this.colors[Math.floor(Math.random() * this.colors.length)];
         
+        // Create and launch rocket
         const rocket = this.createRocket(x);
         this.container.appendChild(rocket);
         
+        // Create explosion after rocket reaches apex
         setTimeout(() => {
             const rocketRect = rocket.getBoundingClientRect();
             this.createExplosion(x, rocketRect.top + 50, color);
             rocket.remove();
         }, 800);
 
+        // Clean up rocket element
         setTimeout(() => {
             if (rocket.parentNode) {
                 rocket.remove();
@@ -191,11 +240,11 @@ class Fireworks {
     /**
      * @function start
      * @param {string|number} duration - Duration in ms or "infinite"
-     * @description Starts the fireworks display for specified duration or indefinitely
+     * @description Starts the fireworks display for specified duration
      */
     start(duration) {
-        const minInterval = 200;
-        const maxInterval = 1000;
+        const minInterval = 200;  // Minimum time between launches
+        const maxInterval = 1000; // Maximum time between launches
         
         const launchNext = () => {
             if (Date.now() < this.endTime) {
@@ -211,7 +260,7 @@ class Fireworks {
 
     /**
      * @function cleanup
-     * @description Stops the fireworks and cleans up all elements
+     * @description Stops the fireworks and removes all elements
      */
     cleanup() {
         this.endTime = 0;

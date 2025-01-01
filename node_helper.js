@@ -4,6 +4,9 @@
  * @author Christian Gillinger
  * @license MIT
  * @version 1.0.0
+ * 
+ * Provides backend support for the MMM-Birthday module.
+ * Handles initialization and error management.
  */
 
 var NodeHelper = require("node_helper");
