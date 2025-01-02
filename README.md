@@ -26,7 +26,7 @@ cd ~/MagicMirror/modules
 
 2. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/MMM-Birthday.git
+git clone https://github.com/cgillinger/MMM-Birthday.git
 ```
 
 3. Install dependencies:
