@@ -7,9 +7,18 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/yourusername/MMM-Birthday.git"
+        "url": "git+https://github.com/cgillinger/MMM-Birthday.git"
     },
     "dependencies": {
         "canvas-confetti": "^1.9.3"
-    }
+    },
+    "keywords": [
+        "MagicMirror²",
+        "birthday",
+        "fireworks",
+        "confetti",
+        "celebration",
+        "module"
+    ]
 }
+
