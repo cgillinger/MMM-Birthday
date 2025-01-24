@@ -3,18 +3,15 @@
  * @description A MagicMirror² module that displays birthday celebrations with fireworks and confetti
  * @author Christian Gillinger
  * @license MIT
- * @version 1.2.5
+ * @version 1.3.0
  * 
  * This module monitors configured birthdays and creates celebratory displays when they occur.
- * It features animated fireworks, confetti effects, and multilingual birthday messages.
+ * Now includes suspend/resume functionality for better compatibility with MMM-Pages.
  */
 
 Module.register("MMM-Birthday", {
     /**
      * @property {Object} defaults - Default configuration values
-     * @property {Array} defaults.birthdays - List of birthday objects with name and date
-     * @property {string} defaults.fireworkDuration - Duration for fireworks ("infinite" or milliseconds)
-     * @property {string} defaults.confettiDuration - Duration for confetti ("infinite" or milliseconds)
      */
     defaults: {
         birthdays: [],           // Example: [{name: "Anna", date: "12-25"}]
@@ -73,16 +70,17 @@ Module.register("MMM-Birthday", {
         Log.info("Starting module: " + this.name);
         
         // Initialize module states
-        this.loaded = false;          // Tracks if module is fully loaded
-        this.fireworks = null;        // Fireworks animation instance
-        this.celebrating = false;     // Current celebration state
-        this.celebrationInterval = null; // Timer for celebration duration
+        this.loaded = false;
+        this.fireworks = null;
+        this.celebrating = false;
+        this._wasCelebrating = false;  // New state tracker for suspend/resume
+        this.celebrationInterval = null;
 
-        // Set module language based on global MagicMirror config
+        // Set module language
         this.language = config.language || 'en';
         Log.info(`${this.name} using language: ${this.language}`);
         
-        // Fallback translations if language file fails to load
+        // Fallback translations
         this.defaultTranslations = {
             MESSAGES: [
                 "🎉 Happy Birthday, {name}! 🎂",
@@ -91,8 +89,59 @@ Module.register("MMM-Birthday", {
             ]
         };
 
-        // Start birthday monitoring
         this.scheduleNextCheck();
+    },
+
+    /**
+     * @function suspend
+     * @description Handles module suspension (hiding) for MMM-Pages compatibility
+     */
+    suspend: function() {
+        if (this.celebrating) {
+            // Store celebration state before cleanup
+            this._wasCelebrating = true;
+            
+            // Clean up active celebrations
+            if (this.fireworks) {
+                this.fireworks.cleanup();
+            }
+            Confetti.cleanup();
+            
+            // Clean up any running timers
+            if (this.celebrationInterval) {
+                clearInterval(this.celebrationInterval);
+            }
+            
+            // Hide the celebration display
+            const wrapper = document.querySelector('.birthday-module');
+            if (wrapper) {
+                wrapper.style.display = 'none';
+            }
+            
+            // Update module state
+            this.celebrating = false;
+        }
+    },
+
+    /**
+     * @function resume
+     * @description Handles module resumption (showing) for MMM-Pages compatibility
+     */
+    resume: function() {
+        if (this._wasCelebrating) {
+            // Restore celebration state
+            this.celebrating = true;
+            this._wasCelebrating = false;
+            
+            // Show the celebration display
+            const wrapper = document.querySelector('.birthday-module');
+            if (wrapper) {
+                wrapper.style.display = 'block';
+            }
+            
+            // Restart celebrations
+            this.celebrateBirthday();
+        }
     },
 
     /**
@@ -111,7 +160,6 @@ Module.register("MMM-Birthday", {
      * @description Sets up periodic checks for birthdays
      */
     scheduleNextCheck: function() {
-        // Check every minute for birthdays
         setInterval(() => {
             this.checkBirthdays();
         }, 60000);
@@ -124,19 +172,16 @@ Module.register("MMM-Birthday", {
      */
     checkBirthdays: function() {
         const now = new Date();
-        // Format current date as MM-DD for comparison
         const currentDate = (now.getMonth() + 1).toString().padStart(2, '0') + 
                            "-" + now.getDate().toString().padStart(2, '0');
 
-        // Validate birthdays configuration
         if (!Array.isArray(this.config.birthdays)) {
             Log.error(`[${this.name}] Birthdays configuration is not an array`);
             return;
         }
 
-        // Check each birthday for a match
         this.config.birthdays.forEach(birthday => {
-            if (birthday.date === currentDate && !this.celebrating) {
+            if (birthday.date === currentDate && !this.celebrating && !this._wasCelebrating) {
                 this.celebrating = true;
                 this.celebrateBirthday(birthday.name);
             }
@@ -152,25 +197,20 @@ Module.register("MMM-Birthday", {
     getRandomMessage: function(name) {
         let messages;
         try {
-            // Attempt to get translated messages
             messages = this.translate("MESSAGES");
-            // Check if translation failed (returns key instead of translation)
             if (messages === "MESSAGES") {
                 messages = this.defaultTranslations.MESSAGES;
             }
         } catch (e) {
-            // Use default messages if translation fails
             messages = this.defaultTranslations.MESSAGES;
             Log.warn(`${this.name} translation failed, using default messages`);
         }
         
-        // Validate messages format
         if (!Array.isArray(messages)) {
             messages = this.defaultTranslations.MESSAGES;
             Log.warn(`${this.name} invalid translation format, using default messages`);
         }
 
-        // Select and personalize random message
         const message = messages[Math.floor(Math.random() * messages.length)];
         return message.replace('{name}', name);
     },
@@ -197,7 +237,6 @@ Module.register("MMM-Birthday", {
         wrapper.innerHTML = '';
         wrapper.appendChild(messageDiv);
         wrapper.style.display = 'block';
-        wrapper.style.visibility = 'visible';
 
         // Start celebration effects
         this.dimOtherModules();
@@ -217,12 +256,7 @@ Module.register("MMM-Birthday", {
      * @description Configures and starts the fireworks animation
      */
     startFireworks: function() {
-        const config = {
-            velocity: 25,      // Reduced velocity for better visibility
-            spread: 15,        // Controlled spread for display
-            delay: 1000       // Time between launches
-        };
-        this.fireworks.start(this.config.fireworkDuration, config);
+        this.fireworks.start(this.config.fireworkDuration);
     },
 
     /**
@@ -266,6 +300,7 @@ Module.register("MMM-Birthday", {
         
         // Reset celebration state
         this.celebrating = false;
+        this._wasCelebrating = false;
         
         // Clean up animations
         if (this.fireworks) {
