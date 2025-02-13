@@ -2,7 +2,9 @@
 
 # MMM-Birthday
 
-A MagicMirror² module that celebrates birthdays with animated fireworks and confetti effects.
+A MagicMirror² module that celebrates birthdays with animated fireworks and confetti effects.  
+(This version is only for plain MagicMirrors. If you run page-changing modules like MMM-Pages, use the paged version instead: [MMM-Birthday-Paged](https://github.com/cgillinger/MMM-Birthday-Paged))
+
 
 ![Ukrainian Birthday Celebration Screenshot](screenshots/birthday.png)
 ![French Birthday Celebration Screenshot](screenshots/birthday_french.png)
