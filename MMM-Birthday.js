@@ -58,7 +58,8 @@ Module.register("MMM-Birthday", {
             nl: "translations/nl.json",
             no: "translations/no.json",
             pt: "translations/pt.json",
-            uk: "translations/uk.json"
+            uk: "translations/uk.json",
+            hu: "translations/hu.json",
         };
     },
 
